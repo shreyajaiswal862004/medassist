@@ -89,7 +89,7 @@ Reply with ONLY one of these exact labels — nothing else:
 Reply with the single label only."""
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
         contents=[
             {
                 "role": "user",
@@ -165,28 +165,52 @@ Reply with the single label only."""
 # ── STEP 4: CLASSIFY PDF ─────────────────────────────────────
 def classify_pdf(file_path: str) -> InputType:
     """
-    for PDFs — checks if it has extractable text or not.
-    digital PDF → has text → pdf_digital
-    scanned PDF → no text → pdf_scanned
-    mixed PDF   → has text AND embedded images → pdf_mixed
+    Classify a PDF by examining ALL pages.
+
+    digital PDF → contains extractable text
+    scanned PDF → contains no extractable text, but contains images
+    mixed PDF   → contains both extractable text and images
+
+    The entire PDF is checked instead of only the first page.
     """
-    import fitz  # pymupdf
+
+    import fitz  # PyMuPDF
 
     doc = fitz.open(file_path)
-    page = doc[0]  # check first page
 
-    text = page.get_text().strip()
-    images = page.get_images(full=True)
+    has_text = False
+    has_images = False
 
-    has_text = len(text) > 30
-    has_images = len(images) > 0
+    try:
+        for page in doc:
+            # Check for extractable text on this page
+            text = page.get_text().strip()
 
-    if has_text and has_images:
-        return InputType.PDF_MIXED
-    elif has_text:
-        return InputType.PDF_DIGITAL
-    else:
-        return InputType.PDF_SCANNED
+            if len(text) > 30:
+                has_text = True
+
+            # Check for images on this page
+            images = page.get_images(full=True)
+
+            if len(images) > 0:
+                has_images = True
+
+            # Once both are found, classification is already known
+            if has_text and has_images:
+                return InputType.PDF_MIXED
+
+        # After checking every page
+        if has_text and has_images:
+            return InputType.PDF_MIXED
+        elif has_text:
+            return InputType.PDF_DIGITAL
+        elif has_images:
+            return InputType.PDF_SCANNED
+        else:
+            return InputType.PDF_SCANNED
+
+    finally:
+        doc.close()
 
 # ── MAIN CLASSIFIER ──────────────────────────────────────────
 def classify_input(

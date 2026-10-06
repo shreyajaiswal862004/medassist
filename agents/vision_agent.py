@@ -6,9 +6,10 @@ from pydantic import BaseModel
 from typing import Optional
 from dotenv import load_dotenv
 from google import genai
-#GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 load_dotenv()
+
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
 
 # ── GEMINI CLIENT ────────────────────────────────────────────
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -124,7 +125,7 @@ Confidence guide:
 Return ONLY the JSON. No explanation."""
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=GEMINI_MODEL,
         contents=[
             {
                 "role": "user",
@@ -193,7 +194,7 @@ Return ONLY valid JSON:
 Return ONLY the JSON."""
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=GEMINI_MODEL,
         contents=[
             {
                 "role": "user",
@@ -251,7 +252,7 @@ Return ONLY valid JSON:
 }"""
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=GEMINI_MODEL,
         contents=[
             {
                 "role": "user",

@@ -2,11 +2,24 @@ medassist_env/
 __pycache__/
 *.pyc
 *.pyo
+
+# Environment / secrets
 .env
+.env.*
+
+# Uploads
 uploads/
+
+# Local database
 *.db
+
+# OS
 .DS_Store
+
+# Node
 node_modules/
 frontend/build/
+
+# Logs / tests
 *.log
 .pytest_cache/

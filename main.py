@@ -2,8 +2,12 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from pathlib import Path
+
 
 load_dotenv()
+
+Path("uploads").mkdir(parents=True, exist_ok=True)
 
 # ── CREATE FASTAPI APP ───────────────────────────────────────
 app = FastAPI(
@@ -16,15 +20,18 @@ app = FastAPI(
 # CORS allows your React frontend (running on localhost:3000)
 # to talk to your FastAPI backend (running on localhost:8000)
 # without the browser blocking the request
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",   # React dev server
-        "http://localhost:5173",   # Vite dev server
+        FRONTEND_URL,
+        "http://localhost:3000",
+        "http://localhost:5173",
     ],
     allow_credentials=True,
-    allow_methods=["*"],           # allow GET, POST, PUT, DELETE
-    allow_headers=["*"],           # allow all headers including Authorization
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ── IMPORT ROUTERS ───────────────────────────────────────────

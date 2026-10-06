@@ -75,7 +75,7 @@ set is_medical to false and findings to empty list.
 Return ONLY the JSON."""
 
     response = gemini_client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
         contents=[{
             "role": "user",
             "parts": [
@@ -135,7 +135,7 @@ Return ONLY valid JSON:
 Return ONLY the JSON."""
 
     response = gemini_client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
         contents=[{
             "role": "user",
             "parts": [
