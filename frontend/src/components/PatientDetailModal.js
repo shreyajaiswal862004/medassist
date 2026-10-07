@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import client from '../api/client';
 
 export default function PatientDetailModal({ patientId, onClose, onScheduleAppointment }) {
@@ -7,12 +7,7 @@ export default function PatientDetailModal({ patientId, onClose, onScheduleAppoi
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('history'); // 'history' | 'reports'
 
-    useEffect(() => {
-        if (!patientId) return;
-        fetchPatientDetails();
-    }, [patientId]);
-
-    const fetchPatientDetails = async () => {
+    const fetchPatientDetails = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -24,7 +19,12 @@ export default function PatientDetailModal({ patientId, onClose, onScheduleAppoi
         } finally {
             setLoading(false);
         }
-    };
+    }, [patientId]);
+
+    useEffect(() => {
+        if (!patientId) return;
+        fetchPatientDetails();
+    }, [patientId, fetchPatientDetails]);
 
     if (!patientId) return null;
 
@@ -33,7 +33,7 @@ export default function PatientDetailModal({ patientId, onClose, onScheduleAppoi
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
-                
+
                 {/* Header */}
                 <div className="p-5 border-b bg-gradient-to-r font-sans from-blue-600 to-indigo-600 text-white flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -75,21 +75,19 @@ export default function PatientDetailModal({ patientId, onClose, onScheduleAppoi
                         <div className="flex border-b bg-gray-50 px-5 gap-4">
                             <button
                                 onClick={() => setActiveTab('history')}
-                                className={`py-3 text-sm font-medium border-b-2 transition ${
-                                    activeTab === 'history'
-                                        ? 'border-blue-600 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                                }`}
+                                className={`py-3 text-sm font-medium border-b-2 transition ${activeTab === 'history'
+                                    ? 'border-blue-600 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                                    }`}
                             >
                                 💬 Consultation History ({details.history?.length || 0})
                             </button>
                             <button
                                 onClick={() => setActiveTab('reports')}
-                                className={`py-3 text-sm font-medium border-b-2 transition ${
-                                    activeTab === 'reports'
-                                        ? 'border-blue-600 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                                }`}
+                                className={`py-3 text-sm font-medium border-b-2 transition ${activeTab === 'reports'
+                                    ? 'border-blue-600 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                                    }`}
                             >
                                 📄 Reports & Uploads ({reports.length})
                             </button>
@@ -106,18 +104,16 @@ export default function PatientDetailModal({ patientId, onClose, onScheduleAppoi
                                     details.history.map((msg) => (
                                         <div
                                             key={msg.id}
-                                            className={`p-4 rounded-xl border ${
-                                                msg.is_emergency
-                                                    ? 'border-red-300 bg-red-50'
-                                                    : msg.role === 'user'
+                                            className={`p-4 rounded-xl border ${msg.is_emergency
+                                                ? 'border-red-300 bg-red-50'
+                                                : msg.role === 'user'
                                                     ? 'border-blue-100 bg-blue-50/50'
                                                     : 'border-gray-200 bg-white'
-                                            }`}
+                                                }`}
                                         >
                                             <div className="flex items-center justify-between mb-2">
-                                                <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                                                    msg.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
-                                                }`}>
+                                                <span className={`text-xs font-semibold px-2 py-0.5 rounded ${msg.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                                                    }`}>
                                                     {msg.role === 'user' ? 'Patient Input' : 'AI / Doctor Assistant'}
                                                 </span>
                                                 <span className="text-xs text-gray-400">

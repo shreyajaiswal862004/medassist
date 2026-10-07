@@ -22,4 +22,5 @@ frontend/build/
 
 # Logs / tests
 *.log
-.pytest_cache/
+.pytest_cache/railway_schema.sql
+railway_schema.sql
